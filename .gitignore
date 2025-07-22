@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Environments
+.env
+.venv/
+env/
+*.sqlite
+*.db
+
+# Conda
+*.conda
+*.lock
+conda-meta/
+
+# Logs and Debug
+*.log
+logs/
+
+# IDEs
+.vscode/
+.idea/
+
+# System
+.DS_Store
