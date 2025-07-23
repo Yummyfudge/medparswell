@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.api.router import router as api_router
+from app.main_router import router  # or wherever we end up placing the APIRouter
 
-app = FastAPI(title="MedParseWell API")
+app = FastAPI()
 
-app.include_router(api_router)
+app.include_router(router)
