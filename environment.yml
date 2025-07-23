@@ -1,0 +1,15 @@
+name: medparswell
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - fastapi
+  - uvicorn
+  - pydantic
+  - httpx
+  - scikit-learn
+  - spacy
+  - pip:
+      - python-multipart
+      - llama-cpp-python
