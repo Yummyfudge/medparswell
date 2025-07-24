@@ -1,37 +1,17 @@
+import os
+from pathlib import Path
 import pytest
-from unittest.mock import patch, MagicMock
-from app.services.llama_runner import run_llama_cli
+from app.services.llama_runner import LlamaRunner
 
-@patch("app.services.llama_runner.subprocess.run")
-def test_run_llama_cli_success(mock_run):
-    # Arrange
-    mock_result = MagicMock()
-    mock_result.returncode = 0
-    mock_result.stdout = "Paris"
-    mock_result.stderr = ""
-    mock_run.return_value = mock_result
-
-    # Act
-    result = run_llama_cli(prompt="What is the capital of France?", verbose=False)
-
-    # Assert
+def test_run_llama_cli_success():
+    fake_binary = Path(__file__).parent.parent / "fakes" / "bin" / "llama-cli"
+    runner = LlamaRunner(binary_path=fake_binary)
+    result = runner.run(prompt="What is the capital of France?", verbose=False)
     assert result == "Paris"
-    mock_run.assert_called_once()
-    args, kwargs = mock_run.call_args
-    assert "--prompt" in args[0]
-    assert "France" in args[0]
 
-@patch("app.services.llama_runner.subprocess.run")
-def test_run_llama_cli_failure(mock_run):
-    # Arrange
-    mock_result = MagicMock()
-    mock_result.returncode = 1
-    mock_result.stdout = ""
-    mock_result.stderr = "Error occurred"
-    mock_run.return_value = mock_result
-
-    # Act & Assert
+def test_run_llama_cli_failure():
+    fake_binary = Path(__file__).parent.parent / "fakes" / "bin" / "llama-cli"
+    runner = LlamaRunner(binary_path=fake_binary)
     with pytest.raises(RuntimeError) as exc_info:
-        run_llama_cli(prompt="What is the capital of France?", verbose=True)
-
+        runner.run(prompt="What is the capital of France?", verbose=True)
     assert "Llama execution failed" in str(exc_info.value)

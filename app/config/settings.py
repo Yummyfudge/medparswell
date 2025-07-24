@@ -1,8 +1,10 @@
-from pydantic import BaseSettings, Field
+from pydantic_settings import BaseSettings
+from pydantic import Field
 import logging
 
 
 class LlamaSettings(BaseSettings):
+    """Configuration settings for the llama-cli application."""
     llama_cli_path: str = Field(..., description="Path to llama-cli binary")
     model_path: str = Field(..., description="Path to .gguf model file")
     context_size: int = Field(default=2048, description="Context window size")
@@ -20,4 +22,5 @@ class LlamaSettings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
 
+# Singleton-like instance used globally for configuration
 settings = LlamaSettings()

@@ -1,11 +1,11 @@
 from fastapi import APIRouter
-from app.schemas.summarize import SummarizeRequest, SummarizeResponse
+from app.schemas.text_summary_schema import SummarizeRequest, SummarizeResponse
 from app.services import llama_runner
 from app.config import settings
 
 router = APIRouter()
 
-@router.post("/summarize", response_model=SummarizeResponse)
+@router.post("/text-summary", response_model=SummarizeResponse)
 async def summarize(request: SummarizeRequest) -> SummarizeResponse:
     output = llama_runner.run_llama_cli(
         prompt=request.text,

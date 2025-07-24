@@ -10,6 +10,7 @@ dependencies:
   - httpx
   - scikit-learn
   - spacy
+  - pydantic-settings
   - pip:
       - python-multipart
       - llama-cpp-python

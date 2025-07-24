@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Simulated fake llama-cli for testing
+echo "Simulated llama-cli"
+echo "Prompt received: $*"
+
+# Fake response
+echo "The capital of France is Paris."
+exit 0
