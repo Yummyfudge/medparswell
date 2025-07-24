@@ -11,6 +11,13 @@ dependencies:
   - scikit-learn
   - spacy
   - pydantic-settings
+  - pytest
+  - pytest-asyncio
+  - cmake
+  - make
+  - mypy
+  - black
+  - isort
   - pip:
       - python-multipart
       - llama-cpp-python
