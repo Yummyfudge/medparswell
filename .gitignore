@@ -1,31 +1,83 @@
-# Python
+# ========================================
+# Python cache and build artifacts
+# ========================================
 __pycache__/
 *.py[cod]
 *.pyo
 *.egg-info/
 
-# Environments
-.env
+# ========================================
+# Virtual environments
+# ========================================
+.env               # Project-specific env file
 .venv/
 env/
-*.sqlite
-*.db
 
-# Conda
+# ========================================
+# Conda artifacts
+# ========================================
 *.conda
 *.lock
 conda-meta/
 
-# Logs and Debug
+# ========================================
+# Database (development only)
+# ========================================
+*.sqlite
+*.db
+
+# ========================================
+# Logs and runtime output
+# ========================================
 *.log
 logs/
-.pytest_cache/
+tmp/
+.cache/
+output/
 
-# IDEs or System
+# ========================================
+# Testing artifacts
+# ========================================
+.pytest_cache/
+tests/fakes/**/*.out
+tests/fakes/**/*.tmp
+
+# ========================================
+# Compiled or binary artifacts
+# ========================================
+*.so
+*.dll
+*.dylib
+*.exe
+
+# ========================================
+# Markdown site/documentation builds
+# ========================================
+site/
+*.html
+
+# ========================================
+# IDEs and editor config
+# ========================================
 .vscode/
 .idea/
 *.ipynb_checkpoints
 .mypy_cache/
 
-# System
+# ========================================
+# macOS system junk
+# ========================================
 .DS_Store
+
+# ========================================
+# Personal notes and helper scripts
+# ========================================
+notes/
+*.planning.md
+*.notes.md
+*.brainstorm.md
+to_linux.sh
+*.sync.sh
+*.rsync.sh
+*.code-workspace
+.env

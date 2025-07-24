@@ -9,4 +9,4 @@ def test_valid_summarization_request():
 def test_empty_content_fails():
     with pytest.raises(ValidationError) as exc_info:
         SummarizeRequest(content="")
-    assert "ensure this value has at least 1 characters" in str(exc_info.value)
+    assert "String should have at least 1 character" in str(exc_info.value)

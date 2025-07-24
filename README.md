@@ -1,50 +1,70 @@
-
-
 # MedParsWell
 
-**MedParsWell** is a modern, modular FastAPI project focused on parsing, analyzing, and summarizing medical documents and data. It is designed with robust LLM and ML integration in mind, enabling streamlined pipelines for OCR, semantic analysis, and summarization of clinical records.
+**MedParsWell** is a modular FastAPI-based API and service layer for wrapping CLI-based LLM backends such as `ik_llama.cpp`. It is designed to expose model metadata and options via schemas compatible with downstream tools like Gradio and future UI layers.
 
 ## Features
 
-- 📄 OCR and document parsing
-- 🧠 LLM summarization backend (supports llama.cpp, ik_llama.cpp, and more)
-- 🔍 Clinical NLP support (e.g., scispaCy, UMLS)
-- 🚀 FastAPI-powered modular architecture
-- 🧪 Easy local development with Conda or venv
-- 🔧 Ready for extension into larger medical inference pipelines
+- 🧠 LLM inference shell wrapper (supports `ik_llama.cpp`)
+- 🛠️ Schema-driven API metadata exposure
+- 🔁 Designed for compatibility with Gradio dynamic forms
+- 📡 Remote execution support via subprocess shell calls
+- 📦 Structured, extensible architecture with FastAPI
+- 🧪 Testable CLI inference layer with mocking support
 
-## Setup
+## Quickstart
 
-1. Clone the repo:
-   ```bash
-   git clone git@github.com:Yummyfudge/medparswell.git
-   cd medparswell
-   ```
+```bash
+git clone git@github.com:Yummyfudge/medparswell.git
+cd medparswell
 
-2. (Recommended) Create a Conda environment:
-   ```bash
-   conda create -n medparswell python=3.12
-   conda activate medparswell
-   ```
+# Create environment
+conda env create -f environment.yml
+conda activate medparswell
 
-3. Install dependencies (once defined):
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Launch dev server
+uvicorn app.main:app --reload
+```
 
-4. Run the server:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
+## Directory Structure
+
+```
+medparswell/
+├── app/
+│   ├── config/
+│   ├── routes/
+│   ├── schemas/
+│   └── services/
+├── tests/
+│   ├── integration/
+│   ├── routes/
+│   ├── schemas/
+│   └── services/
+├── notes/
+├── docs/
+├── to_linux.sh
+├── environment.yml
+└── README.md
+```
 
 ## Roadmap
 
-- [ ] Finalize core scaffolding (✅ in progress)
-- [ ] Add OCR utils
-- [ ] Integrate summarization APIs
-- [ ] Build frontend compatibility layer
-- [ ] Implement end-to-end document pipeline
+- [x] Route scaffolding & health endpoints
+- [x] API schema metadata exposure
+- [x] CLI integration with `ik_llama.cpp`
+- [ ] Add Gradio UI compatibility
+- [ ] Support full CLI argument mapping
+- [ ] Implement request batching & streaming
+- [ ] Local/remote inference split
+- [ ] Add persistent slot caching
+- [ ] CLI embedding-only mode support
 
 ## License
 
 This project is licensed under the MIT License.
+
+## Acknowledgements
+
+This project interfaces with the following external tools:
+
+- [`ik_llama.cpp`](https://github.com/ikawrakow/ik_llama.cpp): A high-performance fork of `llama.cpp` for running GGUF models locally. Used by MedParsWell as the backend inference engine via CLI subprocess calls. See their repository for licensing and attribution details.
+- The [Level1Techs community](https://forum.level1techs.com) and Wendell for the inspiration, ideas, and support that helped shape the goals of this project.
