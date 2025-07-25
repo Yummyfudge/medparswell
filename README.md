@@ -5,7 +5,8 @@
 ## Features
 
 - 🧠 LLM inference shell wrapper (supports `ik_llama.cpp`)
-- 🛠️ Schema-driven API metadata exposure
+- 🛠️ Schema-driven API metadata exposure (Pydantic v2, with `json_schema_extra` for Gradio compatibility)
+- 🪵 Configurable logging with console and file output
 - 🔁 Designed for compatibility with Gradio dynamic forms
 - 📡 Remote execution support via subprocess shell calls
 - 📦 Structured, extensible architecture with FastAPI
@@ -31,6 +32,7 @@ uvicorn app.main:app --reload
 medparswell/
 ├── app/
 │   ├── config/
+│   │   └── logging_config.py
 │   ├── routes/
 │   ├── schemas/
 │   └── services/
@@ -38,7 +40,8 @@ medparswell/
 │   ├── integration/
 │   ├── routes/
 │   ├── schemas/
-│   └── services/
+│   ├── services/
+│   └── conftest.py
 ├── notes/
 ├── docs/
 ├── to_linux.sh
@@ -46,13 +49,21 @@ medparswell/
 └── README.md
 ```
 
+## Run Tests
+
+```bash
+pytest -v
+```
+
+Supports full mocking and isolated CLI testing. One integration test is skipped unless the FastAPI server is running.
+
 ## Roadmap
 
 - [x] Route scaffolding & health endpoints
 - [x] API schema metadata exposure
 - [x] CLI integration with `ik_llama.cpp`
-- [ ] Add Gradio UI compatibility
-- [ ] Support full CLI argument mapping
+- [x] Add Gradio UI compatibility
+- [x] Support full CLI argument mapping
 - [ ] Implement request batching & streaming
 - [ ] Local/remote inference split
 - [ ] Add persistent slot caching

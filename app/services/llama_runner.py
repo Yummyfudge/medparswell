@@ -1,11 +1,9 @@
 import subprocess
-import logging
 import shlex
 from typing import Optional
 from pathlib import Path
 from app.config.settings import settings
-
-logger = logging.getLogger(__name__)
+from app.config.logging_config import logger
 
 class LlamaRunner:
     """Handles execution of the llama-cli binary with a given prompt and configuration.

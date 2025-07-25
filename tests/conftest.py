@@ -8,8 +8,8 @@ from app.main import app
 def client():
     return TestClient(app)
 
-# Override the llama-cli path for tests
+# Override the llama-cli path with a mock script for tests
 @pytest.fixture(autouse=True, scope="function")
 def set_fake_llama_cli_path(monkeypatch):
-    fake_path = os.path.abspath("tests/fakes/bin/llama-cli")
-    monkeypatch.setenv("LLAMA_CLI_PATH", fake_path)
+    mock_path = os.path.abspath("tests/mocks/llama_cpp/fake_llama_cli.sh")
+    monkeypatch.setenv("LLAMA_CLI_PATH", mock_path)
