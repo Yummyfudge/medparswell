@@ -26,6 +26,23 @@ def custom_openapi_wrapper():
 
 app.openapi = custom_openapi_wrapper
 
+from app.constructor.route_factory import register_routes
+from app.config.settings import settings
+
+# Dynamically register only the endpoints and interfaces explicitly enabled
+if not settings.enabled_endpoints:
+    logger.warning("⚠️ No endpoints are enabled in .env. No routes will be registered.")
+    return
+if not settings.enabled_interfaces:
+    logger.warning("⚠️ No interfaces are enabled in .env. No routes will be registered.")
+    return
+if settings.enabled_endpoints and settings.enabled_interfaces:
+    register_routes(
+        app,
+        enabled_endpoints=settings.enabled_endpoints,
+        enabled_interfaces=settings.enabled_interfaces,
+    )
+
 from app.main_router import add_custom_handlers
 add_custom_handlers(app)
 

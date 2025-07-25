@@ -1,4 +1,5 @@
 import logging
+from typing import List
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 from pydantic import Field, ConfigDict
@@ -86,6 +87,23 @@ class LlamaSettings(BaseSettings):
             "description": "Path to the log file",
             "example": "logs/medparswell.log",
             "env_override": "Set LLAMA_LOG_FILE in your .env file to override"
+        }
+    )
+
+    enabled_endpoints: List[str] = Field(
+        default_factory=list,
+        description="Dot-paths to enabled backend endpoints",
+        json_schema_extra={
+            "example": ["ik_llama.text_summarization"],
+            "env_override": "Set ENABLED_ENDPOINTS in your .env file (comma-separated)"
+        }
+    )
+    enabled_interfaces: List[str] = Field(
+        default_factory=list,
+        description="Names of enabled interface types (e.g. swagger_ui, gradio)",
+        json_schema_extra={
+            "example": ["swagger_ui"],
+            "env_override": "Set ENABLED_INTERFACES in your .env file (comma-separated)"
         }
     )
 

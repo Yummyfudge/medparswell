@@ -1,5 +1,14 @@
 # MedParsWell
 
+> ⚠️ **Experimental Design Track**  
+> This branch is an active *research and prototyping* effort. We're testing a new architecture for dynamic route generation based on modular schema+interface+backend definitions.  
+> The goal: make routes declarative and self-assembling—zero boilerplate, zero duplication.  
+> Success would allow CLI-based backends (like `llama-cli`) to expose fully usable REST APIs + OpenAPI docs with almost no manual wiring.  
+> Progress is tracked in the `/notes/` folder and reflected in the evolving constructor framework.  
+>  
+> To run the app using the dynamic route constructor setup, use:  
+> `python runserver.py`
+
 **MedParsWell** is a modular FastAPI-based API and service layer for wrapping CLI-based LLM backends such as `ik_llama.cpp`. It is designed to expose model metadata and options via schemas compatible with downstream tools like Gradio and future UI layers.
 
 ## Features
@@ -26,6 +35,9 @@ cp .env.sample .env  # Set environment variables (edit to match your system)
 
 # Launch dev server
 uvicorn app.main:app --reload
+
+# Or run the dynamic constructor loader
+python runserver.py
 ```
 
 ## Environment Configuration
