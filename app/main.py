@@ -12,6 +12,7 @@ from app.main_router import router  # or wherever we end up placing the APIRoute
 from app.routes import health_routes
 from contextlib import asynccontextmanager
 from app.config.logging_config import logger
+from app.config.docs_config import custom_openapi
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,6 +21,10 @@ async def lifespan(app: FastAPI):
     logger.info("🟢 FastAPI lifespan completed startup steps.", extra={"component": "main"})
 
 app = FastAPI(lifespan=lifespan)
+def custom_openapi_wrapper():
+    return custom_openapi(app)
+
+app.openapi = custom_openapi_wrapper
 
 from app.main_router import add_custom_handlers
 add_custom_handlers(app)
