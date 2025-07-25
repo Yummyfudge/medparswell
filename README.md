@@ -7,6 +7,7 @@
 - 🧠 LLM inference shell wrapper (supports `ik_llama.cpp`)
 - 🛠️ Schema-driven API metadata exposure (Pydantic v2, with `json_schema_extra` for Gradio compatibility)
 - 🪵 Configurable logging with console and file output
+- 🧾 Environment-variable-based configuration via `.env`
 - 🔁 Designed for compatibility with Gradio dynamic forms
 - 📡 Remote execution support via subprocess shell calls
 - 📦 Structured, extensible architecture with FastAPI
@@ -21,15 +22,25 @@ cd medparswell
 # Create environment
 conda env create -f environment.yml
 conda activate medparswell
+cp .env.sample .env  # Set environment variables (edit to match your system)
 
 # Launch dev server
 uvicorn app.main:app --reload
+```
+
+## Environment Configuration
+
+A sample `.env.sample` file is provided to show required and optional environment variables used by the app. Copy this file to `.env` and adjust paths as needed:
+  
+```bash
+cp .env.sample .env
 ```
 
 ## Directory Structure
 
 ```
 medparswell/
+├── .env.sample
 ├── app/
 │   ├── config/
 │   │   └── logging_config.py

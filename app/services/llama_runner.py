@@ -25,6 +25,11 @@ class LlamaRunner:
         self.main_gpu = settings.main_gpu
         self.numa = settings.numa
 
+        logger.debug("Initialized LlamaRunner with config: "
+                     f"binary_path={self.binary_path}, model_path={self.model_path}, "
+                     f"gpu_layers={self.gpu_layers}, ctx_size={self.ctx_size}, "
+                     f"main_gpu={self.main_gpu}, numa={self.numa}")
+
     def run_prompt(self, prompt: str, verbose: bool = False, dry_run: bool = False) -> str:
         """
         Executes llama-cli with the given prompt and configuration options.
@@ -41,10 +46,21 @@ class LlamaRunner:
             FileNotFoundError: If llama binary or model file is missing.
             RuntimeError: If the llama-cli command fails.
         """
+        logger.debug("run_prompt() called with prompt=%r, verbose=%s, dry_run=%s", prompt, verbose, dry_run)
+
         if not self.binary_path.is_file():
+            logger.error("Llama binary not found at path: %s", self.binary_path)
             raise FileNotFoundError(f"Llama binary not found: {self.binary_path}")
         if not self.model_path.is_file():
+            logger.error("Model file not found at path: %s", self.model_path)
             raise FileNotFoundError(f"Model file not found: {self.model_path}")
+
+        logger.debug("Using binary path: %s", self.binary_path)
+        logger.debug("Using model path: %s", self.model_path)
+        logger.debug("Using context size: %s", self.ctx_size)
+        logger.debug("Using GPU layers: %s", self.gpu_layers)
+        logger.debug("Using main GPU: %s", self.main_gpu)
+        logger.debug("Using NUMA setting: %s", self.numa)
 
         cmd = [
             str(self.binary_path),
@@ -56,25 +72,38 @@ class LlamaRunner:
             "--numa", self.numa,
         ]
 
+        logger.debug("Built command: %s", " ".join(cmd))
+
         if verbose:
+            logger.debug("Verbose mode enabled; adding --verbose flag to command.")
             cmd.append("--verbose")
 
         if dry_run:
-            logger.info("[DRY RUN] Command: %s", " ".join(shlex.quote(arg) for arg in cmd))
+            logger.debug("Dry run detected. Simulating execution.")
+            logger.info("[DRY RUN] Command that would have been executed: %s", " ".join(shlex.quote(arg) for arg in cmd))
+            logger.debug("Dry run enabled; skipping execution and returning placeholder output.")
+            logger.info("Dry run complete. Returning simulated output.")
             return "[DRY RUN] Llama output placeholder."
 
-        logger.info("Executing llama-cli")
-        logger.debug("Command: %s", " ".join(shlex.quote(arg) for arg in cmd))
+        logger.info("Launching llama-cli subprocess...")
+        logger.debug("Subprocess command arguments: %s", cmd)
+        logger.debug("About to invoke subprocess with command.")
 
         try:
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=60, check=True)
+            logger.debug("⏳ Timeout set to %s seconds", settings.cli_timeout)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=settings.cli_timeout, check=True)
+            logger.debug("Subprocess finished with return code: %d", result.returncode)
         except subprocess.CalledProcessError as e:
             logger.error("Llama CLI failed with return code %d", e.returncode)
             logger.error("Stdout:\n%s", e.stdout)
             logger.error("Stderr:\n%s", e.stderr)
+            logger.debug("Exception raised: %s", str(e))
             raise RuntimeError(f"Llama execution failed:\n{e.stderr}")
 
-        logger.debug("Llama stdout: %s", result.stdout)
-        logger.debug("Llama stderr: %s", result.stderr)
+        logger.info("Llama CLI executed successfully")
+        logger.debug("Raw stdout:\n%s", result.stdout)
+        logger.debug("Raw stderr:\n%s", result.stderr)
+        logger.debug("Final output returned: %s", result.stdout.strip())
+        logger.debug("Returning output from run_prompt method.")
 
         return result.stdout.strip()

@@ -1,8 +1,10 @@
+import logging
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 from pydantic import Field, ConfigDict
-import logging
 from app.config.logging_config import configure_logging
 
+load_dotenv()
 
 class LlamaSettings(BaseSettings):
     """Configuration settings for the llama-cli application."""
@@ -11,7 +13,7 @@ class LlamaSettings(BaseSettings):
         description="Path to llama-cli binary",
         json_schema_extra={
             "example": "/usr/local/bin/llama-cli",
-            "env_override": "Set LLAMA_LLAMA_CLI_PATH in your .env file to override"
+            "env_override": "Set LLAMA_CLI_PATH in your .env file to override"
         }
     )
     model_path: str = Field(
@@ -59,7 +61,15 @@ class LlamaSettings(BaseSettings):
         json_schema_extra={
             "description": "Enable verbose logging",
             "example": True,
-            "env_override": "Set LLAMA_VERBOSE in your .env file to override (e.g. LLAMA_VERBOSE=false)"
+            "env_override": "Set LLAMA_VERBOSE in your .env file to override"
+        }
+    )
+    cli_timeout: int = Field(
+        default=60,
+        description="Timeout in seconds for llama-cli execution",
+        json_schema_extra={
+            "example": 180,
+            "env_override": "Set LLAMA_CLI_TIMEOUT in your .env file to override"
         }
     )
     log_level: str = Field(
@@ -67,7 +77,15 @@ class LlamaSettings(BaseSettings):
         json_schema_extra={
             "description": "Logging level (e.g. DEBUG, INFO, WARNING)",
             "example": "DEBUG",
-            "env_override": "Set LLAMA_LOG_LEVEL in your .env file to override (e.g. LLAMA_LOG_LEVEL=DEBUG)"
+            "env_override": "Set LLAMA_LOG_LEVEL in your .env file to override"
+        }
+    )
+    log_file: str = Field(
+        default="logs/medparswell.log",
+        json_schema_extra={
+            "description": "Path to the log file",
+            "example": "logs/medparswell.log",
+            "env_override": "Set LLAMA_LOG_FILE in your .env file to override"
         }
     )
 
@@ -78,4 +96,6 @@ class LlamaSettings(BaseSettings):
 
 # Singleton-like instance used globally for configuration
 settings = LlamaSettings()
-configure_logging(settings.log_level)
+configure_logging(settings.log_level, settings.log_file)
+logging.info(f"🔧 Settings initialized: llama_cli_path={settings.llama_cli_path}, model_path={settings.model_path}")
+logging.debug(f"🛠 Logging configured — level: {settings.log_level}, output: {settings.log_file}")
