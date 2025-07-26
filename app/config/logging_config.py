@@ -1,11 +1,15 @@
+ # =============================================================================
+ # This logging config is reused by the exploration branch (dynamic route prototype).
+ # If multiple entrypoints use this file, split logs via distinct filenames or logger names.
+ # =============================================================================
 import logging
 import logging.config
 from pathlib import Path
 from typing import Literal
 import os
 
-LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = os.getenv("LLAMA_LOG_LEVEL", "INFO")
-LOG_FILE = Path(os.getenv("LLAMA_LOG_FILE", Path(__file__).resolve().parent.parent.parent / "logs" / "medparswell.log"))
+LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = os.getenv("APP_LOG_LEVEL", "INFO")
+LOG_FILE = Path(os.getenv("APP_LOG_FILE", Path(__file__).resolve().parent.parent.parent / "logs" / "exploration_main.log"))
 LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

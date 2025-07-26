@@ -2,7 +2,7 @@ from fastapi import APIRouter
 """
 interface_helpers.swagger_ui.py
 
-Helpers to modify route schemas and metadata for compatibility with Swagger UI
+Helpers to modify route schemas and metadata for compatibility with FastAPI UI
 and OpenAPI visual tooling within the interface_helpers module. This includes
 field visibility toggles, example injection, and alias remapping to improve
 documentation and interactive behavior.
@@ -12,8 +12,8 @@ documentation and interactive behavior.
 from typing import Dict, Any
 from pydantic import BaseModel, Field
 
-# Interface preferences for Swagger route construction
-SWAGGER_UI_PREFS = {
+# Interface preferences for FastAPI UI route construction
+FASTAPI_UI_PREFS = {
     "expose_all_fields": True,
     "collapse_advanced": True,
     "field_overrides": {
@@ -25,16 +25,16 @@ SWAGGER_UI_PREFS = {
     },
 }
 
-def apply_swagger_overrides(schema: BaseModel, overrides: Dict[str, Dict[str, Any]]) -> BaseModel:
+def apply_fastapi_ui_overrides(schema: BaseModel, overrides: Dict[str, Dict[str, Any]]) -> BaseModel:
     """
-    Apply Swagger-specific field visibility and customization rules to a Pydantic schema.
+    Apply FastAPI UI-specific field visibility and customization rules to a Pydantic schema.
 
     Args:
         schema (BaseModel): The original Pydantic model.
         overrides (Dict[str, Dict[str, Any]]): A mapping of field names to override definitions.
 
     Returns:
-        BaseModel: A modified schema with Swagger-visible field metadata patched in.
+        BaseModel: A modified schema with FastAPI UI-visible field metadata patched in.
     """
     updated_fields = {}
 
@@ -54,16 +54,16 @@ def apply_swagger_overrides(schema: BaseModel, overrides: Dict[str, Dict[str, An
             # TODO: Consider logging dropped fields for debugging or auditing
             pass
 
-    return type(f"{schema.__name__}SwaggerView", (BaseModel,), updated_fields)
+    return type(f"{schema.__name__}FastapiView", (BaseModel,), updated_fields)
 
-def get_interface_preferences() -> Dict[str, Any]:
+def get_fastapi_ui_preferences() -> Dict[str, Any]:
     """
-    Return the Swagger-specific interface preferences dict.
+    Return the FastAPI UI-specific interface preferences dict.
 
     This allows the route_factory to retrieve interface config without tightly coupling
     to the config module path or name.
 
     Returns:
-        Dict[str, Any]: Swagger UI interface preference dictionary
+        Dict[str, Any]: FastAPI UI interface preference dictionary
     """
-    return SWAGGER_UI_PREFS
+    return FASTAPI_UI_PREFS

@@ -5,8 +5,10 @@ backend configuration defaults, and interface preferences for any interface
 and interface configs for any interface.
 """
 
+# TODO: "text_summarization" is hardcoded in multiple places — refactor to support dynamic route composition
+
 import logging
-from app.constructor.helpers.interface_helpers.swagger_ui import (
+from app.constructor.helpers.interface_helpers.fastapi_ui import (
     get_interface_prefs,
     apply_interface_overrides,
     get_api_router
@@ -29,13 +31,28 @@ def _get_annotated_request_model():
     )
 
 def build_text_summarization_route():
+    # --------------------------------------------------------------------------
+    # Route gating must happen in the orchestrator layer, not here.
+    # This factory **must not** check enabled_endpoints, global settings, or .env
+    # values directly. The orchestrator is responsible for determining if a route
+    # such as "ik_llama.text_summarization" should be enabled, and only then
+    # should it call this function to construct the route.
+    #
+    # Rationale:
+    #   • Clean separation of concerns
+    #   • Testability of this route in isolation
+    #   • Support for alternative orchestration (e.g. CLI-only apps, batch runners)
+    # --------------------------------------------------------------------------
+
+    logger.info("Constructing FastAPI route for ik_llama.text_summarization endpoint")
+
     router = get_api_router()
 
     schema_cls, _ = get_schema_and_defaults("text_summarization")
     response_cls = schema_cls.get_response_model()
     request_model = _get_annotated_request_model()
 
-    logger.debug("route_factory: Composing route for text_summarization")
+    logger.debug("route_factory: Beginning construction of POST /summarize route for text_summarization")
 
     @router.post("/summarize", response_model=response_cls)
     def summarize_endpoint(payload: request_model):

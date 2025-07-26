@@ -3,23 +3,23 @@ from typing import Dict, Any
 """
 📘 Swagger UI Field Customization for OpenAPI Consumers
 
-This configuration file defines how Swagger UI (an OpenAPI specification consumer)
-should render fields associated with each exposed API route.
+This configuration file defines how Swagger UI (an OpenAPI-compatible consumer)
+should render fields exposed via FastAPI routes.
 
-🧠 Context:
-- OpenAPI is a standard for describing RESTful APIs.
-- Swagger UI is a frontend tool that reads OpenAPI specs and displays an interactive API browser.
+🔄 This config is now wired into the new dynamic routing system introduced in `exploration_main.py`.
+It is activated via `.env` using:
+    ENABLED_INTERFACES=swagger_ui
 
 🎯 Purpose:
-- Control visibility, defaults, and display behavior of fields within Swagger UI.
-- Hide backend-specific or deprecated fields from end users.
-- Provide documentation-friendly overrides for select fields.
+- Control visibility, default values, and display hints for fields shown in Swagger UI.
+- Override or suppress fields like internal settings, deprecated flags, or debug toggles.
+- Coordinate with dynamic route generation powered by:
+    - `app/constructor/helpers/interface_helpers/swagger_ui.py`
+    - `app/orchestrators/interfaces.py`
 
-🔄 This is one of several consumer configs. Others may include:
-    - CLI preferences (e.g., verbosity, dry-run)
-    - Gradio UI behavior
-
-See also: `backend_defaults.py` and `text_summarization.py` under `app/endpoints/ik_llama/`.
+🧠 Reminder:
+- This config does not affect CLI or Gradio routes.
+- It also does not launch the FastAPI app itself — see `fastapi_runner.py` for that logic.
 """
 # Configuration for how Swagger UI should render endpoint fields
 

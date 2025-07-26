@@ -9,6 +9,22 @@ load_dotenv()
 
 class LlamaSettings(BaseSettings):
     """Configuration settings for the llama-cli application."""
+    host: str = Field(
+        default="127.0.0.1",
+        json_schema_extra={
+            "description": "Host IP for FastAPI server",
+            "example": "127.0.0.1",
+            "env_override": "Set LLAMA_HOST in your .env file to override"
+        }
+    )
+    port: int = Field(
+        default=8000,
+        json_schema_extra={
+            "description": "Port number for FastAPI server",
+            "example": 8000,
+            "env_override": "Set LLAMA_PORT in your .env file to override"
+        }
+    )
     llama_cli_path: str = Field(
         ...,
         description="Path to llama-cli binary",
@@ -73,47 +89,66 @@ class LlamaSettings(BaseSettings):
             "env_override": "Set LLAMA_CLI_TIMEOUT in your .env file to override"
         }
     )
-    log_level: str = Field(
+    app_log_level: str = Field(
         default="INFO",
         json_schema_extra={
             "description": "Logging level (e.g. DEBUG, INFO, WARNING)",
             "example": "DEBUG",
-            "env_override": "Set LLAMA_LOG_LEVEL in your .env file to override"
+            "env_override": "Set APP_LOG_LEVEL in your .env file to override"
         }
     )
-    log_file: str = Field(
+    app_log_file: str = Field(
         default="logs/medparswell.log",
         json_schema_extra={
             "description": "Path to the log file",
             "example": "logs/medparswell.log",
-            "env_override": "Set LLAMA_LOG_FILE in your .env file to override"
+            "env_override": "Set APP_LOG_FILE in your .env file to override"
         }
     )
 
     enabled_endpoints: List[str] = Field(
         default_factory=list,
-        description="Dot-paths to enabled backend endpoints",
+        alias="ENABLED_ENDPOINTS",
+        description="Comma-separated list of enabled backend endpoints (e.g. ik_llama,text_summarization)",
         json_schema_extra={
             "example": ["ik_llama.text_summarization"],
-            "env_override": "Set ENABLED_ENDPOINTS in your .env file (comma-separated)"
+            "env_override": "Set ENABLED_ENDPOINTS=ik_llama,text_summarization in your .env file"
         }
     )
     enabled_interfaces: List[str] = Field(
         default_factory=list,
-        description="Names of enabled interface types (e.g. swagger_ui, gradio)",
+        alias="ENABLED_INTERFACES",
+        description="Comma-separated list of enabled interface types (e.g. swagger_ui, gradio)",
         json_schema_extra={
             "example": ["swagger_ui"],
-            "env_override": "Set ENABLED_INTERFACES in your .env file (comma-separated)"
+            "env_override": "Set ENABLED_INTERFACES=swagger_ui in your .env file"
         }
     )
 
-    model_config = ConfigDict(env_prefix="LLAMA_", env_file=".env", env_file_encoding="utf-8")
+
+    model_config = ConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    from pydantic import field_validator
+
+    @field_validator("enabled_endpoints", mode="before")
+    @classmethod
+    def split_endpoints(cls, value):
+        if isinstance(value, str):
+            return [v.strip() for v in value.split(",") if v.strip()]
+        return value
+
+    @field_validator("enabled_interfaces", mode="before")
+    @classmethod
+    def split_interfaces(cls, value):
+        if isinstance(value, str):
+            return [v.strip() for v in value.split(",") if v.strip()]
+        return value
 
     def get_logging_level(self):
-        return getattr(logging, self.log_level.upper(), logging.INFO)
+        return getattr(logging, self.app_log_level.upper(), logging.INFO)
 
 # Singleton-like instance used globally for configuration
 settings = LlamaSettings()
-configure_logging(settings.log_level, settings.log_file)
+configure_logging(settings.app_log_level, settings.app_log_file)
 logging.info(f"🔧 Settings initialized: llama_cli_path={settings.llama_cli_path}, model_path={settings.model_path}")
-logging.debug(f"🛠 Logging configured — level: {settings.log_level}, output: {settings.log_file}")
+logging.debug(f"🛠 Logging configured — level: {settings.app_log_level}, output: {settings.app_log_file}")
