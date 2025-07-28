@@ -12,7 +12,7 @@ LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = os.getenv(
 LOG_FILE = Path(os.getenv("APP_LOG_FILE", Path(__file__).resolve().parent.parent.parent / "logs" / "exploration_main.log"))
 LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
-LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s\n%(exc_info)s"
 
 def setup_logging(level: str = LOG_LEVEL, log_file: Path = LOG_FILE) -> None:
     """
@@ -30,6 +30,7 @@ def setup_logging(level: str = LOG_LEVEL, log_file: Path = LOG_FILE) -> None:
                 "format": LOG_FORMAT,
             },
         },
+        # Note: traceback logging via logger.exception(...) will automatically include exc_info
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
@@ -46,6 +47,7 @@ def setup_logging(level: str = LOG_LEVEL, log_file: Path = LOG_FILE) -> None:
         "root": {
             "handlers": ["console", "file"],
             "level": level,
+            "propagate": True,
         },
     }
 
@@ -61,9 +63,8 @@ def configure_logging(level: str = LOG_LEVEL, log_file: Path = LOG_FILE) -> None
 def get_logger(name: str) -> logging.Logger:
     """
     Returns a configured logger with the specified name.
-    Automatically sets up logging if not already initialized.
+    Assumes logging has already been configured via setup_logging() or configure_logging().
     """
-    setup_logging()
     return logging.getLogger(name)
 
 logger = get_logger("medparswell")

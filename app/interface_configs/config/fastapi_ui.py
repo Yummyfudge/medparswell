@@ -23,7 +23,7 @@ It is activated via `.env` using:
 """
 # Configuration for how Swagger UI should render endpoint fields
 
-SWAGGER_UI_PREFS: Dict[str, Any] = {
+FASTAPI_UI_PREFS: Dict[str, Any] = {
     "expose_all_fields": True,  # Show all documented fields, including optional ones
     "collapse_advanced": True,  # Collapse advanced sections (like debug or developer-only fields)
     "field_overrides": {

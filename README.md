@@ -9,6 +9,19 @@
 > To run the app using the dynamic route constructor setup, use:  
 > `python runserver.py`
 
+> ## 🧪 Experimental Design Track
+
+> ### ✅ Sanity Refactor Plan (Checkpoint 1 of 3)
+> We've completed PHASE 1 of the structured rearchitecture:
+> 
+> - [x] Added `get_active_endpoint_config(endpoint: EndpointType)`
+> - [x] Loaded schema, defaults, runner, and route path
+> - [x] Validated model presence or mock fallback
+> - [x] Placed logging for all steps
+> 
+> This ensures that `route_factory` no longer reaches directly into core logic,  
+> and all endpoint construction is routed through the orchestrator via helpers.
+
 **MedParsWell** is a modular FastAPI-based API and service layer for wrapping CLI-based LLM backends such as `ik_llama.cpp`. It is designed to expose model metadata and options via schemas compatible with downstream tools like Gradio and future UI layers.
 
 ## Features

@@ -8,5 +8,5 @@ if __name__ == "__main__":
         host=settings.host,
         port=settings.port,
         reload=settings.reload,
-        log_level=settings.log_level.lower(),
+        log_level=settings.app_log_level.lower(),
     )

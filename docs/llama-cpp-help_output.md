@@ -48,7 +48,7 @@ general:
          --prompt-cache-ro        if specified, uses the prompt cache but does not update it
   -r,    --reverse-prompt PROMPT  halt generation at PROMPT, return control in interactive mode
                                   can be specified more than once for multiple prompts
-  -sp,   --special                special tokens output enabled (default: false)
+  -sp,   --special                special tokens output active (default: false)
   -cnv,  --conversation           run in conversation mode, does not print special tokens and suffix/prefix
                                   if suffix/prefix are not specified, default chat template will be used
                                   (default: false)
@@ -154,7 +154,7 @@ parallel:
   -dt,   --defrag-thold N         KV cache defragmentation threshold (default: -1.0, < 0 - disabled)
   -np,   --parallel N             number of parallel sequences to decode (default: 1)
   -ns,   --sequences N            number of sequences to decode (default: 1)
-  -cb,   --cont-batching          enable continuous batching (a.k.a dynamic batching) (default: enabled)
+  -cb,   --cont-batching          enable continuous batching (a.k.a dynamic batching) (default: active)
   -nocb, --no-cont-batching       disable continuous batching
 
 multi-modality:
@@ -259,7 +259,7 @@ server:
          --log-format {text,json} 
                                   log output format: json or text (default: json)
          --metrics                enable prometheus compatible metrics endpoint (default: disabled)
-         --no-slots               disables slots monitoring endpoint (default: enabled)
+         --no-slots               disables slots monitoring endpoint (default: active)
          --slot-save-path PATH    path to save slot kv cache (default: disabled)
          --chat-template JINJA_TEMPLATE
                                   set custom jinja chat template (default: template taken from model's metadata)

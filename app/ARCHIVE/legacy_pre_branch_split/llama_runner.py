@@ -75,13 +75,13 @@ class LlamaRunner:
         logger.debug("Built command: %s", " ".join(cmd))
 
         if verbose:
-            logger.debug("Verbose mode enabled; adding --verbose flag to command.")
+            logger.debug("Verbose mode active; adding --verbose flag to command.")
             cmd.append("--verbose")
 
         if dry_run:
             logger.debug("Dry run detected. Simulating execution.")
             logger.info("[DRY RUN] Command that would have been executed: %s", " ".join(shlex.quote(arg) for arg in cmd))
-            logger.debug("Dry run enabled; skipping execution and returning placeholder output.")
+            logger.debug("Dry run active; skipping execution and returning placeholder output.")
             logger.info("Dry run complete. Returning simulated output.")
             return "[DRY RUN] Llama output placeholder."
 

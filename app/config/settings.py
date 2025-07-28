@@ -1,14 +1,35 @@
+"""
+settings.py — Application configuration and environment loader.
+
+This module defines the AppSettings class that loads environment variables from
+.env and provides structured, validated access to configuration values throughout
+the application.
+
+Specifically, this file:
+- Loads raw .env fields such as ENABLED_INTERFACES and ENABLED_ENDPOINTS as strings
+- Parses them into internal Enums (InterfaceType and EndpointType) using validation logic
+- Provides clean access to downstream logic through .active_interfaces and .active_endpoints
+"""
 import logging
 from typing import List
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
-from pydantic import Field, ConfigDict
+from pydantic import Field, ConfigDict, model_validator
+from app.config.enums import InterfaceType, EndpointType
+logger = logging.getLogger(__name__)
 from app.config.logging_config import configure_logging
 
 load_dotenv()
 
-class LlamaSettings(BaseSettings):
-    """Configuration settings for the llama-cli application."""
+class AppSettings(BaseSettings):
+    """
+    Enum-backed configuration:
+    - ENABLED_ENDPOINTS and ENABLED_INTERFACES are treated as comma-separated strings in the .env
+    - These are parsed and mapped to Enums (EndpointType, InterfaceType) via properties
+    - This ensures the .env remains user-friendly, while the app uses strongly typed internal values
+    - Invalid entries are logged (but ignored) to ensure clarity without halting startup
+    """
+    """Configuration settings for the application."""
     host: str = Field(
         default="127.0.0.1",
         json_schema_extra={
@@ -25,68 +46,12 @@ class LlamaSettings(BaseSettings):
             "env_override": "Set LLAMA_PORT in your .env file to override"
         }
     )
-    llama_cli_path: str = Field(
-        ...,
-        description="Path to llama-cli binary",
+    reload: bool = Field(
+        default=False,
+        description="Enable FastAPI auto-reload for development",
         json_schema_extra={
-            "example": "/usr/local/bin/llama-cli",
-            "env_override": "Set LLAMA_CLI_PATH in your .env file to override"
-        }
-    )
-    model_path: str = Field(
-        ...,
-        description="Path to .gguf model file",
-        json_schema_extra={
-            "example": "/models/DeepSeek-R1-0528-IQ1_S_R4-00001-of-00003.gguf",
-            "env_override": "Set LLAMA_MODEL_PATH in your .env file to override"
-        }
-    )
-    context_size: int = Field(
-        default=2048,
-        description="Context window size",
-        json_schema_extra={
-            "example": 2048,
-            "env_override": "Set LLAMA_CONTEXT_SIZE in your .env file to override"
-        }
-    )
-    gpu_layers: int = Field(
-        default=2,
-        description="Number of GPU layers to offload",
-        json_schema_extra={
-            "example": 2,
-            "env_override": "Set LLAMA_GPU_LAYERS in your .env file to override"
-        }
-    )
-    main_gpu: int = Field(
-        default=0,
-        description="Primary GPU index to use",
-        json_schema_extra={
-            "example": 0,
-            "env_override": "Set LLAMA_MAIN_GPU in your .env file to override"
-        }
-    )
-    numa: str = Field(
-        default="isolate",
-        description="NUMA configuration strategy",
-        json_schema_extra={
-            "example": "isolate",
-            "env_override": "Set LLAMA_NUMA in your .env file to override"
-        }
-    )
-    verbose: bool = Field(
-        default=True,
-        json_schema_extra={
-            "description": "Enable verbose logging",
-            "example": True,
-            "env_override": "Set LLAMA_VERBOSE in your .env file to override"
-        }
-    )
-    cli_timeout: int = Field(
-        default=60,
-        description="Timeout in seconds for llama-cli execution",
-        json_schema_extra={
-            "example": 180,
-            "env_override": "Set LLAMA_CLI_TIMEOUT in your .env file to override"
+            "example": False,
+            "env_override": "Set RELOAD in your .env file to enable auto-reload (True/False)"
         }
     )
     app_log_level: str = Field(
@@ -106,49 +71,73 @@ class LlamaSettings(BaseSettings):
         }
     )
 
-    enabled_endpoints: List[str] = Field(
-        default_factory=list,
-        alias="ENABLED_ENDPOINTS",
-        description="Comma-separated list of enabled backend endpoints (e.g. ik_llama,text_summarization)",
+    # Raw comma-separated strings from the .env file
+    # These are user-facing values and parsed into internal Enums below
+    active_endpoints_raw: str = Field(
+        default="",
+        description="Comma-separated list of backend endpoints to enable",
         json_schema_extra={
-            "example": ["ik_llama.text_summarization"],
-            "env_override": "Set ENABLED_ENDPOINTS=ik_llama,text_summarization in your .env file"
+            "example": "ik_llama.text_summarization",
+            "env_override": "Set ENABLED_ENDPOINTS in your .env file"
         }
     )
-    enabled_interfaces: List[str] = Field(
-        default_factory=list,
-        alias="ENABLED_INTERFACES",
-        description="Comma-separated list of enabled interface types (e.g. swagger_ui, gradio)",
+    # Raw comma-separated strings from the .env file
+    # These are user-facing values and parsed into internal Enums below
+    active_interfaces_raw: str = Field(
+        default="",
+        description="Comma-separated list of interface types to enable",
         json_schema_extra={
-            "example": ["swagger_ui"],
-            "env_override": "Set ENABLED_INTERFACES=swagger_ui in your .env file"
+            "example": "swagger_ui",
+            "env_override": "Set ENABLED_INTERFACES in your .env file"
         }
     )
+
+    cli_path: str = Field(..., description="Path to the LLaMA CLI binary")
+    model_path: str = Field(..., description="Path to the GGUF model file")
+    context_size: int = Field(default=2048, description="LLaMA context window size")
+    gpu_layers: int = Field(default=2, description="Number of layers to offload to GPU")
+    main_gpu: int = Field(default=0, description="GPU device ID for primary execution")
+    numa: str = Field(default="isolate", description="NUMA binding strategy")
+    verbose: bool = Field(default=False, description="Enable verbose output from llama")
+    cli_timeout: int = Field(default=360, description="Timeout (in seconds) for CLI calls")
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_raw_env_fields(cls, values):
+        """
+        Preprocess .env fields that are expected as raw strings but might be passed as structured inputs.
+        This prevents validation errors from misparsed environment data.
+        """
+        if "active_endpoints" in values and "active_endpoints_raw" not in values:
+            values["active_endpoints_raw"] = values.pop("active_endpoints")
+        if "active_interfaces" in values and "active_interfaces_raw" not in values:
+            values["active_interfaces_raw"] = values.pop("active_interfaces")
+        return values
 
 
     model_config = ConfigDict(env_file=".env", env_file_encoding="utf-8")
 
-    from pydantic import field_validator
+    @property
+    def active_endpoints(self) -> list[EndpointType]:
+        return self._parse_enum_list(self.active_endpoints_raw, EndpointType, "ENABLED_ENDPOINTS")
 
-    @field_validator("enabled_endpoints", mode="before")
-    @classmethod
-    def split_endpoints(cls, value):
-        if isinstance(value, str):
-            return [v.strip() for v in value.split(",") if v.strip()]
-        return value
+    @property
+    def active_interfaces(self) -> list[InterfaceType]:
+        return self._parse_enum_list(self.active_interfaces_raw, InterfaceType, "ENABLED_INTERFACES")
 
-    @field_validator("enabled_interfaces", mode="before")
-    @classmethod
-    def split_interfaces(cls, value):
-        if isinstance(value, str):
-            return [v.strip() for v in value.split(",") if v.strip()]
-        return value
+    def _parse_enum_list(self, raw: str, enum_cls, env_name: str) -> list:
+        results = []
+        for val in (v.strip() for v in raw.split(",") if v.strip()):
+            try:
+                results.append(enum_cls(val))
+            except ValueError:
+                logger.warning(f"⚠️ Unknown entry '{val}' in .env field {env_name} — skipping")
+        return results
 
     def get_logging_level(self):
         return getattr(logging, self.app_log_level.upper(), logging.INFO)
 
 # Singleton-like instance used globally for configuration
-settings = LlamaSettings()
+settings = AppSettings()
 configure_logging(settings.app_log_level, settings.app_log_file)
-logging.info(f"🔧 Settings initialized: llama_cli_path={settings.llama_cli_path}, model_path={settings.model_path}")
 logging.debug(f"🛠 Logging configured — level: {settings.app_log_level}, output: {settings.app_log_file}")

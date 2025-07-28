@@ -1,3 +1,11 @@
+## v0.0.7 — 2025-07-27
+
+### 🧠 Architecture and Orchestration
+- ✅ Phase 1 of endpoint orchestration complete (schema/defaults/runner/route-path)
+- 🧩 Refactored constructor to delegate route assembly to orchestrator
+- 🔍 Logging added at every orchestrator step for full traceability
+- ⚠️ Enforced architecture rule: constructor must not reach upward into orchestrators or global config
+
 ## v0.0.6 — 2025-07-25
 
 ### ✨ Major Milestone
